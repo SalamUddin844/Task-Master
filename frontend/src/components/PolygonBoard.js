@@ -17,7 +17,7 @@ const PolygonBoard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const API = process.env.REACT_APP_API_BASE_URL;
   // Load user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -36,9 +36,9 @@ const PolygonBoard = () => {
       try {
         // Base requests for all users
         const [projectsRes, tasksRes, sprintsRes] = await Promise.all([
-          axios.get("http://192.168.12.224:5001/api/projects", { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get("http://192.168.12.224:5001/api/tasks", { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get("http://192.168.12.224:5001/api/sprints", { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/projects`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/sprints`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setProjects(projectsRes.data || []);
@@ -53,7 +53,7 @@ const PolygonBoard = () => {
     };
 
     fetchData();
-  }, [token, user]);
+  }, [API,token, user]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

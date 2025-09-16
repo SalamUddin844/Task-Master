@@ -8,16 +8,15 @@ const TeamMemberForm = ({ closeModal }) => {
 
   // Get token if you need authentication (optional for LAN test)
   const token = localStorage.getItem("token");
-
+  const API = process.env.REACT_APP_API_BASE_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     try {
-      // Replace localhost with your LAN IP
       const res = await axios.post(
-        "http://192.168.12.224:5001/api/team/invite",
+        `${API}/team/invite`,
         { email },
         {
           headers: token

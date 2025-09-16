@@ -9,8 +9,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/pages/Dashboard/Dashboard"; 
 import Projects from "./components/pages/Project-With-Details/Projects";
 import ProjectDetails from "./components/pages/Project-With-Details/ProjectDetails";
-import Tasks from "./components/pages/Task-Manager/Tasks";
-import Sprints from "./components/pages/Sprint-Manager/Sprints";
+import TaskOffice from "./components/pages/Task-Manager/TaskOffice";
+import SprintOffice from "./components/pages/Sprint-Manager/SprintOffice";
 import SprintTasks from "./components/pages/Task-Manager/SprintTasks"; 
 import Team from "./components/pages/Team-Manager/Team";
 import Reports from "./components/pages/Reports-Stats/Reports";
@@ -41,8 +41,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:projectId" element={<ProjectDetails />} />
-          <Route path="task-office" element={<Tasks />} />
-          <Route path="sprint-office" element={<Sprints />} />
+          <Route path="task-office" element={<TaskOffice />} />
+          <Route path="sprint-office" element={<SprintOffice />} />
 
           <Route path="projects/:projectId/sprints/:sprintId" element={<SprintTasks />} />
           

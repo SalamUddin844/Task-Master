@@ -7,7 +7,7 @@ exports.inviteUser = async (req, res) => {
     return res.status(400).json({ message: "Email is required" });
 
   try {
-    const FRONTEND_URL = process.env.FRONTEND_URL ;
+    const FRONTEND_URL = process.env.FRONTEND_URL || "http://192.168.12.224:3000" ;
     const inviteLink = `${FRONTEND_URL}/register?email=${encodeURIComponent(
       email
     )}`;

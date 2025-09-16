@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import TaskForm from "../forms/TaskForm";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 
+
 const SprintTask = () => {
   const { projectId, sprintId } = useParams();
   const token = localStorage.getItem("token");
@@ -22,12 +23,12 @@ const SprintTask = () => {
   // Confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
-
+  const API = process.env.REACT_APP_API_BASE_URL;
   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://192.168.12.224:5001/api/tasks", {
+      const res = await axios.get(`${API}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -51,19 +52,19 @@ const SprintTask = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, sprintId, users]);
+  }, [API,token, sprintId, users]);
 
   // Fetch users
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get("http://192.168.12.224:5001/api/users", {
+      const res = await axios.get(`${API}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) setUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users:", err.response?.data || err.message);
     }
-  }, [token]);
+  }, [API,token]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
   useEffect(() => { if (users.length) fetchTasks(); }, [fetchTasks, users]);
@@ -79,7 +80,7 @@ const SprintTask = () => {
     if (!taskToDelete) return;
 
     try {
-      await axios.delete(`http://192.168.12.224:5001/api/tasks/${taskToDelete.id}`, {
+      await axios.delete(`${API}/tasks/${taskToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks((prev) => prev.filter((t) => t.id !== taskToDelete.id));
@@ -120,12 +121,12 @@ const SprintTask = () => {
 
   // Status badge classes
   const getStatusBadge = (status) => {
-    if (!status) return "bg-gray-100 text-gray-800";
+    if (!status) return "bg-gray-100 text-gray-800 font-semibold text-sm";
     switch (status.toLowerCase()) {
-      case "done": return "bg-green-100 text-green-800";
-      case "in-progress": return "bg-yellow-100 text-yellow-800";
-      case "todo": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "done": return "bg-green-100 text-green-800 font-semibold text-sm";
+      case "in-progress": return "bg-yellow-100 text-yellow-800 font-semibold text-sm";
+      case "todo": return "bg-red-100 text-red-800 font-semibold text-sm";
+      default: return "bg-gray-100 text-gray-800 font-semibold text-sm";
     }
   };
 
@@ -194,53 +195,63 @@ const SprintTask = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredTasks.map((task) => (
-            <tr
-              key={task.id}
-              className="hover:bg-gray-50 transition border-b last:border-0"
-            >
-              <td className="py-3 px-4">{task.title}</td>
-              <td className="py-3 px-4 text-gray-600 truncate max-w-xs">
-                {task.description}
-              </td>
-              <td className="py-3 px-4">{formatDate(task.start_date)}</td>
-              <td className="py-3 px-4">{formatDate(task.end_date)}</td>
-              <td className="py-3 px-4">
-                <span
-                  className={`px-3 py-1 rounded-full font-medium text-xs ${getStatusBadge(
-                    task.status
-                  )}`}
-                >
-                  {task.status || "-"}
-                </span>
-              </td>
-              <td className="py-3 px-4 text-gray-800 font-medium">
-                {task.assignee_name || "-"}
-              </td>
-              <td className="py-3 px-4">{task.time_estimation || "-"} hr</td>
-              <td className="py-3 px-4">{task.priority || "-"}</td>
-              <td className="py-3 px-4 flex gap-3">
-                <button
-                  onClick={() => {
-                    setEditingTask(task);
-                    setShowTaskModal(true);
-                  }}
-                  className="text-gray-500 hover:text-blue-600 transition"
-                  title="Edit Task"
-                >
-                  <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => confirmDeleteTask(task)}
-                  className="text-gray-500 hover:text-red-600 transition"
-                  title="Delete Task"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+  {filteredTasks.map((task) => (
+    <tr
+      key={task.id}
+      className="hover:bg-gray-50 transition border-b last:border-0"
+    >
+      <td className="py-3 px-4 font-medium text-gray-800">
+        {task.title}
+      </td>
+      <td className="py-3 px-4 text-gray-600">
+        {task.description}
+      </td>
+      <td className="py-3 px-4 text-gray-600">
+        {formatDate(task.start_date)}
+      </td>
+      <td className="py-3 px-4 text-gray-600">
+        {formatDate(task.end_date)}
+      </td>
+      <td className="py-3 px-4">
+        <span
+          className={`px-3 py-1 rounded-full font-medium text-sm ${getStatusBadge(
+            task.status
+          )}`}
+        >
+          {task.status || "-"}
+        </span>
+      </td>
+      <td className="py-3 px-4 text-gray-800 font-medium">
+        {task.assignee_name || "-"}
+      </td>
+      <td className="py-3 px-4 text-gray-600">
+        {task.time_estimation || "-"} hr
+      </td>
+      <td className="py-3 px-4 text-gray-600">
+        {task.priority || "-"}
+      </td>
+      <td className="py-3 px-4 flex gap-3">
+        <button
+          onClick={() => {
+            setEditingTask(task);
+            setShowTaskModal(true);
+          }}
+          className="text-gray-500 hover:text-blue-600 transition"
+          title="Edit Task"
+        >
+          <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => confirmDeleteTask(task)}
+          className="text-gray-500 hover:text-red-600 transition"
+          title="Delete Task"
+        >
+          <Trash2 size={16} />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
       </table>
     </div>
   )}

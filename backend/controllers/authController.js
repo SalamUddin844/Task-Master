@@ -3,7 +3,6 @@ const { verifyToken } = require("../middleware/verifyJWT");
 const db = require("../database/connectdb");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-// const { use } = require("react");
 
 const salt_rounds = 12;
 
@@ -186,7 +185,7 @@ async function forgotPassword(req, res) {
             }
           });
 
-          const FRONTEND_URL = process.env.FRONTEND_URL || "http://192.168.12.224:3000";
+          const FRONTEND_URL = process.env.FRONTEND_URL;
           const resetUrl = `${FRONTEND_URL}/reset-password/${resetToken}`;
 
           await transporter.sendMail({

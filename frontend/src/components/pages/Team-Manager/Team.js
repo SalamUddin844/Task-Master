@@ -9,11 +9,11 @@ const TeamMembers = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchText, setSearchText] = useState("");
   const token = localStorage.getItem("token");
-
+  const API = process.env.REACT_APP_API_BASE_URL;
   // Fetch team members
   const fetchMembers = useCallback(async () => {
     try {
-      const res = await axios.get("http://192.168.12.224:5001/api/team/invite", {
+      const res = await axios.get(`${API}/team/invite`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = Array.isArray(res.data) ? res.data : [];
@@ -22,7 +22,7 @@ const TeamMembers = () => {
     } catch (err) {
       console.error("Failed to fetch team members:", err);
     }
-  }, [token]);
+  }, [API,token]);
 
   useEffect(() => {
     fetchMembers();

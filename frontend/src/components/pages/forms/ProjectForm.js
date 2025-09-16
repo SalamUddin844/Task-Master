@@ -6,6 +6,7 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
+  const API= process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     if (editingProject) {
@@ -30,7 +31,7 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
       let data;
       if (editingProject) {
         const res = await axios.put(
-          `http://192.168.12.224:5001/api/projects/${editingProject.id}`,
+          `${API}/projects/${editingProject.id}`,
           project,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -38,7 +39,7 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
         setProjects((prev) => prev.map((p) => (p.id === data.id ? data : p)));
       } else {
         const res = await axios.post(
-          "http://192.168.12.224:5001/api/projects",
+          `${API}/projects`,
           project,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -57,30 +58,30 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-base bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2.5 font-sans text-base bg-white p-6 rounded-2xl">
       <h2 className="text-xl font-semibold text-gray-800">{editingProject ? "Edit Project" : "Create New Project"}</h2>
       {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-
+      <label for="name" className="text-gray-700 text-sm mb-0.5">Project Name</label>
       <input
         type="text"
         name="name"
         value={project.name}
         onChange={handleChange}
         placeholder="Project Name"
-        className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 p-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
-
+      <label for="description" className=" text-gray-700 text-sm mb-0.5">Project Description</label>
       <textarea
         name="description"
         value={project.description}
         onChange={handleChange}
         placeholder="Project Description"
         rows={4}
-        className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 p-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      <div className="flex justify-end gap-3 mt-2">
+      <div className="flex justify-end gap-3 mt-3">
         <button type="button" onClick={closeModal} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
           Cancel
         </button>

@@ -20,12 +20,13 @@ const Projects = () => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const API= process.env.REACT_APP_API_BASE_URL;
 
   // Wrap fetchProjects in useCallback to avoid ESLint warning
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://192.168.12.224:5001/api/projects", {
+      const res = await axios.get(`${API}/projects`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects(res.data);
@@ -36,7 +37,7 @@ const Projects = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [API,token]);
 
   // Use fetchProjects in useEffect
   useEffect(() => {
@@ -66,7 +67,7 @@ const Projects = () => {
 
     try {
       await axios.delete(
-        `http://192.168.12.224:5001/api/projects/${projectToDelete.id}`,
+        `${API}/projects/${projectToDelete.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchProjects();
@@ -88,7 +89,7 @@ const Projects = () => {
     <div className="p-6 max-w-7xl mx-auto font-sans">
   {/* Header */}
   <div className="flex justify-between items-center mb-6">
-    <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+    <h1 className="text-2xl font-bold text-gray-900">Projects List</h1>
     <button
       onClick={() => {
         setEditingProject(null);

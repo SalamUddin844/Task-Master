@@ -8,8 +8,8 @@ export default function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
+  const API = process.env.REACT_APP_API_BASE_URL;
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setMessage("");
     setError("");
@@ -17,7 +17,7 @@ export default function ForgotPassword() {
 
     try {
       const res = await axios.post(
-        "http://192.168.12.224:5001/api/auth/forgot-password",
+        `${API}/auth/forgot-password`,
         { email }
       );
       setMessage(res.data.message || "Password reset link sent to your email.");
@@ -29,10 +29,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-5">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
               <div className="w-4 h-4 bg-blue-600 rounded"></div>
@@ -59,12 +59,13 @@ export default function ForgotPassword() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="relative">
+              <label for="email" className='block text-gray-700 text-sm mb-2'>Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address"
-                className="w-full pl-4 pr-4 py-4 border border-gray-200 rounded-xl 
+                className="w-full pl-4 pr-4 py-4 text-sm border border-gray-200 rounded-xl 
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent 
                            outline-none transition-all"
                 required

@@ -1,6 +1,7 @@
 const db = require("../database/connectdb");
 
 // -------------------- GET ALL TASKS --------------------
+// -------------------- GET ALL TASKS --------------------
 exports.getTasks = (req, res) => {
   const query = `
     SELECT 
@@ -15,9 +16,14 @@ exports.getTasks = (req, res) => {
       t.assignee_id,
       u.name AS assignee_name, 
       t.time_estimation,
-      t.priority
+      t.priority,
+      s.title AS sprint_name,
+      p.name AS project_name
     FROM tasks t
     LEFT JOIN users u ON t.assignee_id = u.id
+    LEFT JOIN sprints s ON t.sprint_id = s.id
+    LEFT JOIN projects p ON s.project_id = p.id
+    ORDER BY t.id DESC
   `;
 
   db.query(query, (err, results) => {

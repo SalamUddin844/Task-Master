@@ -9,7 +9,7 @@ const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const API = process.env.REACT_APP_API_BASE_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -18,7 +18,7 @@ const ResetPassword = () => {
 
     try {
       const res = await axios.post(
-        `http://192.168.12.224:5001/api/auth/reset-password/${token}`,
+        `${API}auth/reset-password/${token}`,
         { password }
       );
       setMessage(res.data.message);

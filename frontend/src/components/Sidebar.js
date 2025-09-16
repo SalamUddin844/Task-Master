@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import { Home, Users, FolderOpen, CheckSquare, Calendar, BarChart3, User, LogOut, Menu, X } from "lucide-react";
+import {
+  Home,
+  Users,
+  FolderOpen,
+  CheckSquare,
+  Calendar,
+  BarChart3,
+  User,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = ({ user, onLogout }) => {
-  const [isOpen, setIsOpen] = useState(true); 
+  const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -11,8 +22,8 @@ const Sidebar = ({ user, onLogout }) => {
   const baseMenu = [
     { id: "dashboard", label: "Dashboard", icon: Home, route: "/dashboard" },
     { id: "projects", label: "Projects", icon: FolderOpen, route: "/projects" },
-    { id: "task-office", label: "Task Office", icon: CheckSquare, route: "/task-office" },
     { id: "sprint-office", label: "Sprint Office", icon: Calendar, route: "/sprint-office" },
+    { id: "task-office", label: "Task Office", icon: CheckSquare, route: "/task-office" },
   ];
 
   const adminMenu = [
@@ -21,12 +32,11 @@ const Sidebar = ({ user, onLogout }) => {
   ];
 
   const menuItems = user?.role === "admin" ? [...baseMenu, ...adminMenu] : baseMenu;
-
   const currentPathSegment = location.pathname.split("/")[1];
 
   return (
     <>
-      {/* Sidebar Toggle Button for mobile */}
+      {/* Sidebar Toggle (Mobile) */}
       <button
         className="fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md md:hidden shadow-md"
         onClick={() => setIsOpen(!isOpen)}
@@ -44,11 +54,16 @@ const Sidebar = ({ user, onLogout }) => {
         `}
       >
         {/* Logo */}
-        <div className="P-6 h-20 flex justify-center items-center border-b border-gray-200">
+        <div className="p-6 h-20 flex items-center gap-4 border-b border-gray-200">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center">
+              <div className="w-2.5 h-2.5 bg-blue-600"></div>
+            </div>
+          </div>
           <h1 className="text-xl font-bold text-blue-600">TaskMaster</h1>
         </div>
 
-        {/* Menu */}
+        {/* Menu Items */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {menuItems.map((item) => {
@@ -63,7 +78,10 @@ const Sidebar = ({ user, onLogout }) => {
                         : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
                     }`}
                   >
-                    <item.icon size={20} className={isActive ? "text-white" : "text-blue-600"} />
+                    <item.icon
+                      size={20}
+                      className={isActive ? "text-white" : "text-blue-600"}
+                    />
                     <span className="font-medium">{item.label}</span>
                   </button>
                 </li>
@@ -72,7 +90,7 @@ const Sidebar = ({ user, onLogout }) => {
           </ul>
         </nav>
 
-        {/* User info & logout */}
+        {/* User Info + Logout */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white">
@@ -87,12 +105,13 @@ const Sidebar = ({ user, onLogout }) => {
             onClick={onLogout}
             className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-white hover:bg-blue-600 rounded-lg transition-colors duration-200"
           >
-            <LogOut size={16} /> Logout
+            <LogOut size={16} />
+            Logout
           </button>
         </div>
       </div>
 
-      {/* Overlay when sidebar is open on mobile */}
+      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/20 z-30 md:hidden"

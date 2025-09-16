@@ -8,14 +8,16 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
   const [status, setStatus] = useState("in_progress");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const token = localStorage.getItem("token");
+  const API = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     if (editingSprint) {
-      setTitle(editingSprint.title || "");
-      setStartDate(editingSprint.start_date || "");
-      setDueDate(editingSprint.due_date || "");
-      setStatus(editingSprint.status || "in_progress");
+      setTitle(editingSprint?.title || "");
+      setStartDate(editingSprint?.start_date || "");
+      setDueDate(editingSprint?.due_date || "");
+      setStatus(editingSprint?.status || "in_progress");
     } else {
       setTitle("");
       setStartDate("");
@@ -30,20 +32,44 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
 
     setLoading(true);
     setError("");
+
     try {
-      const payload = { title, project_id: project.id, start_date: startDate || null, due_date: dueDate || null, status };
+      const payload = {
+        title,
+        project_id: project?.id,
+        start_date: startDate || null,
+        due_date: dueDate || null,
+        status,
+      };
+
       let res;
       if (editingSprint) {
-        res = await axios.put(`http://localhost:5001/api/sprints/${editingSprint.id}`, payload, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.put(
+          `${API}/sprints/${editingSprint?.id}`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       } else {
-        res = await axios.post("http://localhost:5001/api/sprints", payload, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.post(
+          `${API}/sprints`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       }
-      const sprintData = res.data.data || res.data;
+
+      const sprintData = res?.data?.data || res?.data;
+
       fetchSprints();
-      setSprints((prev) => editingSprint ? prev.map((s) => (s.id === sprintData.id ? sprintData : s)) : [...prev, sprintData]);
+
+      setSprints((prev) =>
+        editingSprint
+          ? prev.map((s) => (s.id === sprintData?.id ? sprintData : s))
+          : [...prev, sprintData]
+      );
+
       closeModal();
     } catch (err) {
-      console.error(err.response || err);
+      console.error(err?.response || err);
       setError("Failed to save sprint. Please try again.");
     } finally {
       setLoading(false);
@@ -51,10 +77,20 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-base bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
-      <h2 className="text-xl font-semibold text-gray-800">{editingSprint ? "Edit Sprint" : "Create New Sprint"}</h2>
-      {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-3 font-sans text-base bg-white p-6 rounded-2xl"
+    >
+      <h2 className="text-xl font-semibold text-gray-800">
+        {editingSprint ? "Edit Sprint" : "Create New Sprint"}
+      </h2>
 
+      {error && (
+        <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">
+          {error}
+        </p>
+      )}
+      <label for="title" className="block text-gray-700 text-sm mb-0.5">Sprint Title</label>
       <input
         type="text"
         placeholder="Sprint Title"
@@ -63,7 +99,7 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
         className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
-
+      <label for="startDate" className="block text-gray-700 text-sm mb-0.5">Start Date</label>
       <input
         type="date"
         value={startDate}
@@ -71,25 +107,39 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
         className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
-
+      <label for="dueDate" className="block text-gray-700 text-sm mb-0.5">Due Date</label>
       <input
         type="date"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
         className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-
-      <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <label for="status" className="block text-gray-700 text-sm mb-0.5">Status</label>
+      <select
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+        className="border border-gray-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
         <option value="in_progress">In Progress</option>
         <option value="active">Active</option>
         <option value="completed">Completed</option>
       </select>
 
-      <div className="flex justify-end gap-3 mt-2">
-        <button type="button" onClick={closeModal} className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+      <div className="flex justify-end gap-3 mt-3">
+        <button
+          type="button"
+          onClick={closeModal}
+          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+        >
           Cancel
         </button>
-        <button type="submit" disabled={loading} className={`px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition ${loading ? "opacity-70 cursor-not-allowed" : ""}`}>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+        >
           {loading ? "Saving..." : editingSprint ? "Save Changes" : "Create Sprint"}
         </button>
       </div>

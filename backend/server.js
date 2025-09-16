@@ -7,8 +7,8 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    credentials: true,
+    origin: "*",
+    credentials: true
   })
 );
 app.use(express.json());
@@ -32,6 +32,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-// Start server
+// Start server on all network interfaces
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`Server running on port ${PORT} and accessible on the network at http://192.168.12.224:${PORT}`)
+);
