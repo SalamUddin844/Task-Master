@@ -3,6 +3,7 @@ import axios from "axios";
 import { Eye, Trash, X } from "lucide-react";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import TaskOfficeModal from "../../modals/taskOfficeModal";
+import BACKEND_API from "../../../config";
 
 const SprintOffice = () => {
   const [sprints, setSprints] = useState([]);
@@ -12,21 +13,20 @@ const SprintOffice = () => {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   // Fetch sprints
   useEffect(() => {
     axios
-      .get(`${API}/sprints`, {
+      .get(`${BACKEND_API}/sprints`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        console.log("API response:", res.data);
+        console.log("BACKEND_API response:", res.data);
         setSprints(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, [API,token]);
+  }, [token]);
 
   const handleViewSprint = (sprint) => {
     setSelectedSprint(sprint);
@@ -35,7 +35,7 @@ const SprintOffice = () => {
 
   const handleDeleteSprint = (id) => {
     axios
-      .delete(`${API}/sprints/${id}`, {
+      .delete(`${BACKEND_API}/sprints/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
@@ -56,7 +56,7 @@ const SprintOffice = () => {
         <thead className="bg-gray-200">
           <tr>
             <th className="p-3 border text-left text-gray-700">Title</th>
-            <th className="p-3 border text-center text-gray-700">Action</th>
+            <th className="p-3 border text-center text-gray-700">View Details</th>
           </tr>
         </thead>
         <tbody>
@@ -75,8 +75,8 @@ const SprintOffice = () => {
           ) : (
             sprints.map((sprint) => (
               <tr key={sprint.id} className="hover:bg-gray-50">
-                <td className="p-3 border">{sprint.title}</td>
-                <td className="p-3 border text-center">
+                <td className="p-3 border text-sm text-gray-700">{sprint.title}</td>
+                <td className="p-3 border text-center text-gray-700">
                   <button
                     onClick={() => handleViewSprint(sprint)}
                     className="text-gray-500 hover:text-gray-700"

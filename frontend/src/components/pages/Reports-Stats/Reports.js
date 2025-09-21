@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { BarChart3, TrendingUp } from "lucide-react";
+import BACKEND_API from "../../../config";
 
 const Reports = () => {
   const [tasks, setTasks] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [team, setTeam] = useState([]);
-  const [searchText, setSearchText] = useState(""); // <-- search state
+  const [searchText, setSearchText] = useState(""); 
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [tasksRes, sprintsRes, teamRes] = await Promise.all([
-          axios.get(`${API}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/sprints`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/users`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/sprints`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/users`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setTasks(tasksRes.data);
@@ -29,7 +29,7 @@ const Reports = () => {
     };
 
     fetchData();
-  }, [API, token]);
+  }, [token]);
 
   // Calculate task completion rate
   const totalTasks = tasks.length;

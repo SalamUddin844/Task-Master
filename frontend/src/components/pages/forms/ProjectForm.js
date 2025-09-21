@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import BACKEND_API from "../../../config";
 
 const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects }) => {
   const [project, setProject] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
-  const API= process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     if (editingProject) {
@@ -31,7 +31,7 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
       let data;
       if (editingProject) {
         const res = await axios.put(
-          `${API}/projects/${editingProject.id}`,
+          `${BACKEND_API}/projects/${editingProject.id}`,
           project,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -39,7 +39,7 @@ const ProjectForm = ({ closeModal, setProjects, editingProject, fetchProjects })
         setProjects((prev) => prev.map((p) => (p.id === data.id ? data : p)));
       } else {
         const res = await axios.post(
-          `${API}/projects`,
+          `${BACKEND_API}/projects`,
           project,
           { headers: { Authorization: `Bearer ${token}` } }
         );

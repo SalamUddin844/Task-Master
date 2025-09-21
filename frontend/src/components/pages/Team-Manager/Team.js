@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import InviteUserForm from "../forms/TeamMemberForm";
 import axios from "axios";
+import BACKEND_API from "../../../config"; 
 
 const TeamMembers = () => {
   const [members, setMembers] = useState([]);
@@ -9,11 +10,11 @@ const TeamMembers = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchText, setSearchText] = useState("");
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
+  
   // Fetch team members
   const fetchMembers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/team/invite`, {
+      const res = await axios.get(`${BACKEND_API}/team/invite`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = Array.isArray(res.data) ? res.data : [];
@@ -22,7 +23,7 @@ const TeamMembers = () => {
     } catch (err) {
       console.error("Failed to fetch team members:", err);
     }
-  }, [API,token]);
+  }, [token]);
 
   useEffect(() => {
     fetchMembers();

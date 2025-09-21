@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import BACKEND_API from "../../../config";
+
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -8,7 +10,7 @@ export default function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const API = process.env.REACT_APP_API_BASE_URL;
+  
   const handleSubmit = async(e) => {
     e.preventDefault();
     setMessage("");
@@ -17,7 +19,7 @@ export default function ForgotPassword() {
 
     try {
       const res = await axios.post(
-        `${API}/auth/forgot-password`,
+        `${BACKEND_API}/auth/forgot-password`,
         { email }
       );
       setMessage(res.data.message || "Password reset link sent to your email.");

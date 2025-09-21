@@ -64,7 +64,7 @@ const Sidebar = ({ user, onLogout }) => {
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-4 text-base overflow-y-auto">
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const isActive = currentPathSegment === item.route.split("/")[1];

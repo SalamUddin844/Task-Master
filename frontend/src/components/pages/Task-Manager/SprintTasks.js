@@ -6,7 +6,7 @@ import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 import TaskForm from "../forms/TaskForm";
 import ConfirmationModal from "../../modals/ConfirmationModal";
-
+import BACKEND_API from "../../../config";
 
 const SprintTask = () => {
   const { projectId, sprintId } = useParams();
@@ -23,12 +23,11 @@ const SprintTask = () => {
   // Confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
-  const API = process.env.REACT_APP_API_BASE_URL;
   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/tasks`, {
+      const res = await axios.get(`${BACKEND_API}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -52,19 +51,19 @@ const SprintTask = () => {
     } finally {
       setLoading(false);
     }
-  }, [API,token, sprintId, users]);
+  }, [token, sprintId, users]);
 
   // Fetch users
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/users`, {
+      const res = await axios.get(`${BACKEND_API}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) setUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users:", err.response?.data || err.message);
     }
-  }, [API,token]);
+  }, [token]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
   useEffect(() => { if (users.length) fetchTasks(); }, [fetchTasks, users]);
@@ -80,7 +79,7 @@ const SprintTask = () => {
     if (!taskToDelete) return;
 
     try {
-      await axios.delete(`${API}/tasks/${taskToDelete.id}`, {
+      await axios.delete(`${BACKEND_API}/tasks/${taskToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks((prev) => prev.filter((t) => t.id !== taskToDelete.id));

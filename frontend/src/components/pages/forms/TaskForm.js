@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import axios from "axios";
+import BACKEND_API from "../../../config";
 
 const TaskForm = ({ sprint, closeModal, fetchTasks, editingTask, setTasks }) => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,6 @@ const TaskForm = ({ sprint, closeModal, fetchTasks, editingTask, setTasks }) => 
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   // Populate form if editing
   useEffect(() => {
@@ -39,7 +39,7 @@ const TaskForm = ({ sprint, closeModal, fetchTasks, editingTask, setTasks }) => 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data } = await axios.get(`${API}/users`, {
+        const { data } = await axios.get(`${BACKEND_API}/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(data);
@@ -48,7 +48,7 @@ const TaskForm = ({ sprint, closeModal, fetchTasks, editingTask, setTasks }) => 
       }
     };
     fetchUsers();
-  }, [API, token]);
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,14 +77,14 @@ const TaskForm = ({ sprint, closeModal, fetchTasks, editingTask, setTasks }) => 
 
     try {
       if (editingTask) {
-        await axios.put(`${API}/tasks/${editingTask.id}`, payload, {
+        await axios.put(`${BACKEND_API}/tasks/${editingTask.id}`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTasks((prev) =>
           prev.map((t) => (t.id === editingTask.id ? { id: editingTask.id, ...payload } : t))
         );
       } else {
-        const res = await axios.post(`${API}/tasks`, payload, {
+        const res = await axios.post(`${BACKEND_API}/tasks`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTasks((prev) => [...prev, { id: res.data.id, ...payload }]);

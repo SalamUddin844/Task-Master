@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import BACKEND_API from "../../../config";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -9,7 +10,8 @@ const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const API = process.env.REACT_APP_API_BASE_URL;
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -18,7 +20,7 @@ const ResetPassword = () => {
 
     try {
       const res = await axios.post(
-        `${API}auth/reset-password/${token}`,
+        `${BACKEND_API}auth/reset-password/${token}`,
         { password }
       );
       setMessage(res.data.message);
@@ -65,7 +67,7 @@ const ResetPassword = () => {
                 type="password"
                 placeholder="Enter your new password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}  
                 required
                 className="w-full px-4 py-4 border border-gray-200 rounded-xl 
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent 

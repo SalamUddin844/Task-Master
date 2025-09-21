@@ -34,7 +34,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Redirect default "/" to dashboard */}
+          {/* Redirect default "/" to login */}
           <Route index element={<Navigate to="/login" replace />} />
 
           {/* User-accessible routes */}

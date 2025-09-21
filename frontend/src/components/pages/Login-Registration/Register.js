@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import {ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import BACKEND_API from "../../../config";
 
 export default function Register() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate(); 
+  const [formData, setFormData] = useState({ 
     name: '',
     email: '',
     password: '',
@@ -15,7 +16,6 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -25,14 +25,14 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) { /// checking password and confirm
       setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API}/auth/register`, {
+      const res = await axios.post(`${BACKEND_API}/auth/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -73,7 +73,7 @@ export default function Register() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5"> 
           {/* Name */}
           <div className="relative">
             <label for="name" className="block text-gray-700 text-sm mb-2">Name</label>

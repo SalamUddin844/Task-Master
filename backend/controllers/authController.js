@@ -3,6 +3,8 @@ const { verifyToken } = require("../middleware/verifyJWT");
 const db = require("../database/connectdb");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const { checkPasswordStrength } = require("../middleware/passwordChecker");
+const { validateEmail } = require("../middleware/emailChecker");
 
 const salt_rounds = 12;
 
@@ -13,6 +15,14 @@ async function register(req, res) {
     if (!name || !email || !password)
       return res.status(400).json({ message: "All fields are required" });
 
+    if(!validateEmail(email)){
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
+    const { valid, message } = checkPasswordStrength(password);
+    if (!valid) {
+        return res.status(400).json({ success: false, message });
+    }
     const hashedPassword = await bcrypt.hash(password, salt_rounds);
 
     db.query(
@@ -168,7 +178,7 @@ async function forgotPassword(req, res) {
 
     const user = results[0];
     const resetToken = generateUniqueToken({ email: user.email });
-    const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+    const resetTokenExpires = new Date(Date.now() + 3600000);
 
     db.query(
       "UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE email = ?",
@@ -177,7 +187,7 @@ async function forgotPassword(req, res) {
         if (err) return res.status(500).json({ message: "Database error", error: err.sqlMessage || err });
 
         try {
-          const transporter = nodemailer.createTransport({
+          const transporter = nodemailer.createTransport({    /// transport that hits the gmail server
             service: "gmail",
             auth: {
               user: process.env.EMAIL_USER,

@@ -4,6 +4,7 @@ import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import CreateModal from "./modals/modal";
+import BACKEND_API from "../config";
 
 const PolygonBoard = () => {
   const token = localStorage.getItem("token");
@@ -17,7 +18,7 @@ const PolygonBoard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const API = process.env.REACT_APP_API_BASE_URL;
+  
   // Load user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -36,9 +37,9 @@ const PolygonBoard = () => {
       try {
         // Base requests for all users
         const [projectsRes, tasksRes, sprintsRes] = await Promise.all([
-          axios.get(`${API}/projects`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/sprints`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/projects`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_API}/sprints`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setProjects(projectsRes.data || []);
@@ -53,7 +54,7 @@ const PolygonBoard = () => {
     };
 
     fetchData();
-  }, [API,token, user]);
+  }, [token, user]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

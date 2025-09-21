@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import ProjectForm from "../forms/ProjectForm";
 import { X, Trash2, Eye } from "lucide-react";
@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../modals/ConfirmationModal";
+import BACKEND_API from "../../../config";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -20,13 +21,11 @@ const Projects = () => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const API= process.env.REACT_APP_API_BASE_URL;
 
-  // Wrap fetchProjects in useCallback to avoid ESLint warning
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/projects`, {
+      const res = await axios.get(`${BACKEND_API}/projects`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects(res.data);
@@ -37,7 +36,7 @@ const Projects = () => {
     } finally {
       setLoading(false);
     }
-  }, [API,token]);
+  }, [token]);
 
   // Use fetchProjects in useEffect
   useEffect(() => {
@@ -67,7 +66,7 @@ const Projects = () => {
 
     try {
       await axios.delete(
-        `${API}/projects/${projectToDelete.id}`,
+        `${BACKEND_API}/projects/${projectToDelete.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchProjects();
@@ -80,8 +79,8 @@ const Projects = () => {
     }
   };
 
-  const handleEdit = (project) => {
-    setEditingProject(project);
+  const handleEdit = (project) => {    
+    setEditingProject(project);  
     setShowModal(true);
   };
    
@@ -137,7 +136,7 @@ const Projects = () => {
               key={p.id}
               className="hover:bg-gray-50 transition border-b last:border-0"
             >
-              <td className="py-3 px-4 font-medium text-gray-800">{p.name}</td>
+              <td className="py-3 px-4 font-medium text-gray-700">{p.name}</td>
               <td className="py-3 px-4 text-gray-600 truncate">
                 {p.description || "-"}
               </td>

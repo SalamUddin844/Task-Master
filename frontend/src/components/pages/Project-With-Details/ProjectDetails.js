@@ -6,12 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import SprintForm from "../forms/SprintForm";
 import ConfirmationModal from "../../modals/ConfirmationModal";
+import BACKEND_API from "../../../config";
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   const [project, setProject] = useState(null);
   const [sprints, setSprints] = useState([]);
@@ -37,25 +37,25 @@ const ProjectDetails = () => {
     )}-${String(date.getDate()).padStart(2, "0")}`;
   };
 
-  // Fetch project details
+  //Fetch project details
   useEffect(() => {
     if (!projectId) return;
     setLoadingProject(true);
 
     axios
-      .get(`${API}/projects/${projectId}`, {
+      .get(`${BACKEND_API}/projects/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setProject(res.data))
       .catch((err) => console.error("Error fetching project:", err))
       .finally(() => setLoadingProject(false));
-  }, [API, projectId, token]);
+  }, [projectId, token]);
 
   // Fetch sprints
   const fetchSprints = useCallback(async () => {
     setLoadingSprints(true);
     try {
-      const res = await axios.get(`${API}/sprints/project/${projectId}`, {
+      const res = await axios.get(`${BACKEND_API}/sprints/project/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = Array.isArray(res.data.data) ? res.data.data : [];
@@ -66,7 +66,7 @@ const ProjectDetails = () => {
     } finally {
       setLoadingSprints(false);
     }
-  }, [API, projectId, token]);
+  }, [projectId, token]);
 
   useEffect(() => {
     if (projectId) fetchSprints();
@@ -112,7 +112,7 @@ const ProjectDetails = () => {
     if (!sprintToDelete) return;
 
     try {
-      await axios.delete(`${API}/sprints/${sprintToDelete.id}`, {
+      await axios.delete(`${BACKEND_API}/sprints/${sprintToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSprints((prev) => prev.filter((s) => s.id !== sprintToDelete.id));

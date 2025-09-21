@@ -3,6 +3,7 @@ import axios from "axios";
 import { Eye, Trash, X } from "lucide-react";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import TaskOfficeModal from "../../modals/taskOfficeModal";
+import BACKEND_API from "../../../config";
 
 const TaskOffice = () => {
   const [tasks, setTasks] = useState([]);
@@ -11,17 +12,16 @@ const TaskOffice = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   // Fetch tasks
   useEffect(() => {
     axios
-      .get(`${API}/tasks`, {
+      .get(`${BACKEND_API}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setTasks(res.data))
       .catch((err) => console.error(err));
-  }, [API,token]);
+  }, [token]);
 
   const handleViewTask = (task) => {
     setSelectedTask(task);
@@ -30,7 +30,7 @@ const TaskOffice = () => {
 
   const handleDeleteTask = (id) => {
     axios
-      .delete(`${API}/tasks/${id}`, {
+      .delete(`${BACKEND_API}/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
@@ -57,7 +57,7 @@ const TaskOffice = () => {
         <tbody>
           {tasks.map((task) => (
             <tr key={task.id} className="hover:bg-gray-50">
-              <td className="p-3 border">{task.title}</td>
+              <td className="p-3 border text-sm text-gray-700">{task.title}</td>
               <td className="p-3 border text-center">
                 <button
                   onClick={() => handleViewTask(task)}

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import BACKEND_API from "../../../config";
 
 const TeamMemberForm = ({ closeModal }) => {
   const [email, setEmail] = useState("");
@@ -8,7 +9,6 @@ const TeamMemberForm = ({ closeModal }) => {
 
   // Get token if you need authentication (optional for LAN test)
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -16,7 +16,7 @@ const TeamMemberForm = ({ closeModal }) => {
 
     try {
       const res = await axios.post(
-        `${API}/team/invite`,
+        `${BACKEND_API}/team/invite`,
         { email },
         {
           headers: token

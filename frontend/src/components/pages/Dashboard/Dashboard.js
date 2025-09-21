@@ -2,18 +2,22 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FolderOpen, CheckSquare, Calendar, AlertCircle } from "lucide-react";
+import BACKEND_API from "../../../config";
 
 const Dashboard = () => {
-  const [projects, setProjects] = useState([]);
-  const [sprints, setSprints] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [error, setError] = useState("");
+  // ---------------- State ----------------
+  const [projects, setProjects] = useState([]);   // All projects
+  const [sprints, setSprints] = useState([]);     // All sprints
+  const [tasks, setTasks] = useState([]);         // All tasks
+  const [error, setError] = useState("");         // Error handling
+
   const today = new Date();
   const navigate = useNavigate();
 
+  // Get logged-in user ID
   const userId = Number(JSON.parse(localStorage.getItem("user"))?.id);
-  const API = process.env.REACT_APP_API_BASE_URL;
 
+  // ---------------- Fetch Data ----------------
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,12 +30,13 @@ const Dashboard = () => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [projectsRes, sprintsRes, tasksRes] = await Promise.all([
-          axios.get(`${API}/projects`, config),
-          axios.get(`${API}/sprints`, config),
-          axios.get(`${API}/tasks`, config),
+          axios.get(`${BACKEND_API}/projects`, config),
+          axios.get(`${BACKEND_API}/sprints`, config),
+          axios.get(`${BACKEND_API}/tasks`, config),
         ]);
 
         setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : []);
+
         setSprints(
           Array.isArray(sprintsRes.data)
             ? sprintsRes.data
@@ -39,6 +44,7 @@ const Dashboard = () => {
             ? sprintsRes.data.data
             : []
         );
+
         setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : []);
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err.response || err);
@@ -47,8 +53,9 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [API]);
+  }, []);
 
+  
   // ---------------- Overall Activities ----------------
   const totalProjects = projects.length;
   const totalSprints = sprints.length;
@@ -57,24 +64,30 @@ const Dashboard = () => {
     (t) => t?.due_date && new Date(t.due_date) < today
   ).length;
 
+  // console.log("userId:", userId);
+  // if(userId===tasks.assignee_id) {
+  //   return console.log("matched");
+  // }
   // ---------------- My Activities ----------------
-  // Tasks assigned to logged-in user only
-  const myTasks = tasks.filter((t) => t?.assignee_id === userId);
-
-  // Sprints that have at least one task assigned to this user
+  const myTasks = tasks.filter((t) => t?.assignee_id === userId); 
+  // match kortesi user id er sathe task table er assignee_id er sathe
+  // console.log("My Tasks:", myTasks);
   const mySprintIds = [...new Set(myTasks.map((t) => t?.sprint_id))];
+  // console.log("My Sprint IDs:", mySprintIds);
   const mySprints = sprints.filter((s) => mySprintIds.includes(s?.id));
-
-  // Projects that have at least one sprint which has my tasks
+  // console.log("My Sprints:", mySprints);
   const myProjectIds = [...new Set(mySprints.map((s) => s?.project_id))];
+  // console.log("My Project IDs:", myProjectIds);
   const myProjects = projects.filter((p) => myProjectIds.includes(p?.id));
+  // console.log("My Projects:", myProjects);
 
   return (
     <div className="bg-gray-50 min-h-screen py-10">
       <div className="container mx-auto px-4">
+        {/* Error Message */}
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        {/* Overall Activities */}
+        {/* ---------------- Overall Activities ---------------- */}
         <h1 className="text-xl font-semibold text-gray-700 mb-4">
           Overall Activities
         </h1>
@@ -112,8 +125,10 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* My Activities */}
-        <h1 className="text-xl font-semibold text-gray-700 mb-4">My Activities</h1>
+        {/* ---------------- My Activities ---------------- */}
+        <h1 className="text-xl font-semibold text-gray-700 mb-4">
+          My Activities
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
           <StatCard
             title="My Projects"

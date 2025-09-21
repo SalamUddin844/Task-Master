@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import BACKEND_API from "../../../config";
 
 const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSprint }) => {
   const [title, setTitle] = useState("");
@@ -10,7 +11,6 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     if (editingSprint) {
@@ -45,13 +45,13 @@ const SprintForm = ({ project, closeModal, setSprints, fetchSprints, editingSpri
       let res;
       if (editingSprint) {
         res = await axios.put(
-          `${API}/sprints/${editingSprint?.id}`,
+          `${BACKEND_API}/sprints/${editingSprint?.id}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         res = await axios.post(
-          `${API}/sprints`,
+          `${BACKEND_API}/sprints`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );

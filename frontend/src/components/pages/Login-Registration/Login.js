@@ -1,42 +1,54 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import BACKEND_API from "../../../config";
 
-export default function Login() {
+
+export default function Login() {     
+
+  //logical part
+  
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  
+  const [formData, setFormData] = useState({ email: '', password: '' }); /// data entered by user IN LOGIN FORM
+
+  const [showPassword, setShowPassword] = useState(false); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const API = process.env.REACT_APP_API_BASE_URL;
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value })); /// updates formData state with user input
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    e.preventDefault();   /// prevents the default form submission behavior
+    setError(''); // clear previous errors
+    setLoading(true);  // to disable the submit button and show loading state
+
+    
+    
+  /// Send login request to backend
 
     try {
-      const res = await axios.post(`${API}/auth/login`, formData);
-      const { token, user } = res.data;
+      const res = await axios.post(`${BACKEND_API}/auth/login`, formData);// post request to backend with formData (email and password)
+      const { token, user } = res.data; /// extract token and user info from response
 
       // Save token and user info
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(user));// user info is stored as a string
       localStorage.setItem('role', user.role);
 
-      navigate('/dashboard');
+      navigate('/dashboard');  /// redirect to dashboard on successful login
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Login failed'); /// error status that set to backend like database error, invalid credentials
     } finally {
-      setLoading(false);
+      setLoading(false);  /// not coming here if login is successfull
     }
   };
 
+
+  //UI rendering part
   return (
     <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -51,9 +63,8 @@ export default function Login() {
           <p className="text-gray-500 mt-1">Simple project management</p>
         </div>
 
-        {/* Login Form */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit} // when form is submitted, handleSubmit function is called
           className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6"
         >
           {error && (
@@ -64,14 +75,14 @@ export default function Login() {
 
           {/* Email */}
           <div className="relative">
-            <label for="email" className='block text-gray-700 text-sm mb-2'>Email</label>
+            <label htmlFor="email" className='block text-gray-700 text-sm mb-2'>Email</label>
             {/* <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" /> */}
             <input
               id="email"
               type="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={formData.email}  // value is taken from formData state
+              onChange={handleChange}// when user types, handleChange function is called to update formData state
               placeholder="Email address"
               className="w-full pl-5 pr-4 py-3 text-sm border border-gray-200 rounded-xl 
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent 
@@ -106,7 +117,7 @@ export default function Login() {
               className="absolute inset-y-12 right-0 pr-3 flex items-center 
                          text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-" />}
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
 
