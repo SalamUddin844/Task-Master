@@ -45,7 +45,7 @@ export default function Register() {
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('role', user.role);
 
-      navigate('/dashboard');
+      navigate('/logn');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {

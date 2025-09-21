@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react"; 
 import BACKEND_API from "../../../config";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,11 +21,12 @@ const ResetPassword = () => {
 
     try {
       const res = await axios.post(
-        `${BACKEND_API}auth/reset-password/${token}`,
+        `${BACKEND_API}/auth/reset-password/${token}`,
         { password }
       );
       setMessage(res.data.message);
-      setTimeout(() => navigate("/login"), 2000);
+      navigate("/login");
+      // setTimeout(() => navigate("/login"), 3000); 
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     } finally {
@@ -64,15 +66,22 @@ const ResetPassword = () => {
             {/* Password Input */}
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your new password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}  
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-4 border border-gray-200 rounded-xl 
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                           outline-none transition-all"
+                           outline-none transition-all pr-12"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
 
             {/* Submit Button */}

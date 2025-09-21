@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { checkPasswordStrength } = require("../middleware/passwordChecker");
 const { isValidEmail } = require("../middleware/emailChecker");
+const { isValidElement } = require("react");
 
 const salt_rounds = 12;
 
@@ -41,9 +42,13 @@ async function register(req, res) {
           return res.status(500).json({ message: "Database error", error: err.sqlMessage || err });
         }
 
+
+
+        //--------------------- JWT Token Generation ----------------
         const jwtToken = generateUniqueToken({ id: result.insertId, email, role: "user" });
         console.log("jwtToken:", jwtToken);
 
+        ///--------------------- Response Send to backend ----------------
         res.status(201).json({
           message: "User registered successfully",
           token: jwtToken,
@@ -56,40 +61,7 @@ async function register(req, res) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
-// exports.register = async (req, res) => {
-//   try {
-//     const [name, email, password] = req.body;
-//     if (!name || !email || !password) {
-//       return res.status(400).json({ message: "Information missing,Please check again." });
-//     }
-//     const hashedPassword = await bcrypt.hash(password, salt_rounds);
-//     db.query(
-//       "INSERT INTO users (name , email, password, role) VALUES(?,?,?,?)",
-//       [name, email, hashedPassword, "user"],
-//       (err, result) => {
-//         if (err) {
-//           console.error(err || err.sqlmessage);
-//           if (err.code === "ER_DP_ENTRY")
-//             return res.status(400).json({ message: "Email alreay registered!!" });
-//           return res.status(500).json({ message: "Internal server error!!" });
-//         }
 
-//         const JWTUniqueToken = generateUniqueToken({ if: result.insertId, email, role: "user" });
-//         console.log("JWT token is : ", JWTUniqueToken);
-
-//         res.status(201).json({
-//           massage: "Registration Successfull",
-//           Token: JWTUniqueToken,
-//           user: { id: result.insertId, email, role: "user" }
-
-//         })
-//       }
-//     )
-//   } catch {
-//       console.log("server error");
-//       res.status(500).json({message:"Internal server error" || err});
-//   }
-// }
 // ------------------ LOGIN ------------------
 async function login(req, res) {
   try {
@@ -131,47 +103,7 @@ async function login(req, res) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
-// exports.login = async(req, res)=>{
-//   try{
-//     const [email,password]=req.body;
-//     if(!email || !password){
-//       return res.status(400).json({message:"Missing information, please check again!!"});
-//     }
-    
-//     db.query("SELECT*FROM users WHERE email =? ",[email],
-//       async(err,result)=>{
-//         if(err){
-//           console.error("database error", err || err.sqlmessage);
-//           return res.status(500).json({error:err||sqlmessage});
-//         }
 
-//         if(result.length===0)
-//           res.status(400).json({message:"Invalid credential!!"});
-        
-//         const user=result[0];
-//         const validatePassword= await bcrypt.compare(password, user.password);
-//         if(!validatePassword)
-//           return res.status(400).json({message:"Invalid Password!!"});
-
-//         const JWTUniqueToken = generateUniqueToken({id: user.id, email: user.email, role: user.role});
-
-//         res.status(201).json({
-//           message: "login successfull",
-//           JWTUniqueToken,
-//           user:{
-//             id: user,id,
-//             name: user.name,
-//             email: user.email,
-//             role : user.role
-//           }
-//         })
-//       }
-//     )
-//   }catch{
-//     console.log("internal server error");
-//     res.status(500).json({message:"internal server error"|| err});
-//   }
-// }
 // ------------------ FORGOT PASSWORD ------------------
 async function forgotPassword(req, res) {
   const { email } = req.body;
@@ -228,6 +160,13 @@ async function resetPassword(req, res) {
   const { token } = req.params;
   const { password } = req.body;
   if (!password) return res.status(400).json({ message: "Password is required" });
+
+
+  if(!token) return res.status(400).json({ message: "Token is required" });
+
+  //----------------checking password formate----------------  
+  const { valid, message } = checkPasswordStrength(password);
+  if (!valid) return res.status(400).json({ message });
 
   let decoded;
   try {
