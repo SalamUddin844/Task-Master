@@ -4,7 +4,7 @@ const db = require("../database/connectdb");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { checkPasswordStrength } = require("../middleware/passwordChecker");
-const { validateEmail } = require("../middleware/emailChecker");
+const { isValidEmail } = require("../middleware/emailChecker");
 
 const salt_rounds = 12;
 
@@ -15,14 +15,19 @@ async function register(req, res) {
     if (!name || !email || !password)
       return res.status(400).json({ message: "All fields are required" });
 
-    if(!validateEmail(email)){
+    //----------------email formate checking----------------
+    if(!isValidEmail(email)){
       return res.status(400).json({ success: false, message: "Invalid email format" });
     }
 
+
+    ///---------------password strength checking----------------
     const { valid, message } = checkPasswordStrength(password);
     if (!valid) {
         return res.status(400).json({ success: false, message });
     }
+
+    ///---------------password hashing----------------
     const hashedPassword = await bcrypt.hash(password, salt_rounds);
 
     db.query(
