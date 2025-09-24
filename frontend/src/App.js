@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";   // 👈 Import toaster
+
 import PolygonBoard from "./components/PolygonBoard";
 import Login from "./components/pages/Login-Registration/Login";
 import Register from "./components/pages/Login-Registration/Register";
@@ -19,6 +21,14 @@ import LiveChat from "./components/pages/chatOption/LiveChat";
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+        duration: 3000, 
+        }}
+    />
+
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
@@ -35,19 +45,17 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Redirect default "/" to login */}
+          {/* Default redirect */}
           <Route index element={<Navigate to="/login" replace />} />
 
-          {/* User-accessible routes */}
+          {/* User routes */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:projectId" element={<ProjectDetails />} />
           <Route path="task-office" element={<TaskOffice />} />
           <Route path="sprint-office" element={<SprintOffice />} />
-          <Route path="/live-chat" element={<LiveChat />} />
-
           <Route path="projects/:projectId/sprints/:sprintId" element={<SprintTasks />} />
-          
+          <Route path="live-chat" element={<LiveChat />} />
 
           {/* Admin-only routes */}
           <Route
@@ -68,6 +76,7 @@ function App() {
           />
         </Route>
 
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

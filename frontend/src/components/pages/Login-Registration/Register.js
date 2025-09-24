@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { toast} from 'react-hot-toast';
 import {ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -25,7 +26,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (formData.password !== formData.confirmPassword) { /// checking password and confirm
+    if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
@@ -38,6 +39,8 @@ export default function Register() {
         password: formData.password,
       });
 
+      toast.success('Successfully registered!')
+
       const { token, user } = res.data;
 
       // Save token and user info
@@ -45,7 +48,7 @@ export default function Register() {
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('role', user.role);
 
-      navigate('/logn');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -159,7 +162,7 @@ export default function Register() {
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
-
+        
         <p className="text-center text-gray-500 text-sm mt-4">
           Already have an account?{' '}
           <button

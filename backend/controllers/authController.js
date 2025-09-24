@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { checkPasswordStrength } = require("../middleware/passwordChecker");
 const { isValidEmail } = require("../middleware/emailChecker");
-const { isValidElement } = require("react");
 
 const salt_rounds = 12;
 
@@ -160,7 +159,6 @@ async function resetPassword(req, res) {
   const { token } = req.params;
   const { password } = req.body;
   if (!password) return res.status(400).json({ message: "Password is required" });
-
 
   if(!token) return res.status(400).json({ message: "Token is required" });
 

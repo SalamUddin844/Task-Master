@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { Smile, Paperclip, Send } from "lucide-react";
 import BACKEND_API from "../../../config";
@@ -6,7 +6,12 @@ import BACKEND_API from "../../../config";
 const LiveChat = () => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
-  const config = { headers: { Authorization: `Bearer ${token}` } };
+
+  // ✅ useMemo to stabilize `config`
+  const config = useMemo(
+    () => ({ headers: { Authorization: `Bearer ${token}` } }),
+    [token]
+  );
 
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -34,7 +39,7 @@ const LiveChat = () => {
       }
     };
     fetchUsers();
-  }, [currentUser.id]);
+  }, [currentUser.id, config]);
 
   // Fetch messages when user selected
   useEffect(() => {
@@ -53,7 +58,7 @@ const LiveChat = () => {
       }
     };
     fetchMessages();
-  }, [selectedUser]);
+  }, [selectedUser, config]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedUser) return;

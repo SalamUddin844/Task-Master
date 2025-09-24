@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {toast} from 'react-hot-toast';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,11 +9,8 @@ import BACKEND_API from "../../../config";
 export default function Login() {     
 
   //logical part
-  
   const navigate = useNavigate();
-  
   const [formData, setFormData] = useState({ email: '', password: '' }); /// data entered by user IN LOGIN FORM
-
   const [showPassword, setShowPassword] = useState(false); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,6 +30,7 @@ export default function Login() {
 
     try {
       const res = await axios.post(`${BACKEND_API}/auth/login`, formData);// post request to backend with formData (email and password)
+      toast.success("Login Successful!");
       const { token, user } = res.data; /// extract token and user info from response
 
       // Save token and user info
@@ -145,7 +144,7 @@ export default function Login() {
             {loading ? 'Signing In...' : 'Sign In'}
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
-
+          
           {/* Sign Up Link */}
           <p className="text-center text-gray-500 text-sm mt-4">
             Don’t have an account?{' '}

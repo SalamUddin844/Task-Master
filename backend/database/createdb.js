@@ -1,5 +1,5 @@
 require("dotenv").config({ path: "./.env" });
-const mysql = require("mysql2/promise");
+const mysql = require("mysql");
 
 async function initDB() {
   try {

@@ -1,32 +1,24 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FolderOpen, CheckSquare, Calendar, AlertCircle } from "lucide-react";
+import { FolderOpen, CheckSquare, Calendar } from "lucide-react";
 import BACKEND_API from "../../../config";
 
 const Dashboard = () => {
-  // ---------------- State ----------------
-  const [projects, setProjects] = useState([]);   // All projects
-  const [sprints, setSprints] = useState([]);     // All sprints
-  const [tasks, setTasks] = useState([]);         // All tasks
-  const [error, setError] = useState("");         // Error handling
+  const [projects, setProjects] = useState([]);
+  const [sprints, setSprints] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [error, setError] = useState("");
 
-  const today = new Date();
   const navigate = useNavigate();
-
-  // Get logged-in user ID
+  // const today = new Date();
   const userId = Number(JSON.parse(localStorage.getItem("user"))?.id);
 
-  // ---------------- Fetch Data ----------------
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          setError("No auth token found. Please log in.");
-          return;
-        }
-
+        if (!token) return setError("No auth token found. Please log in.");
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [projectsRes, sprintsRes, tasksRes] = await Promise.all([
@@ -36,7 +28,6 @@ const Dashboard = () => {
         ]);
 
         setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : []);
-
         setSprints(
           Array.isArray(sprintsRes.data)
             ? sprintsRes.data
@@ -44,10 +35,9 @@ const Dashboard = () => {
             ? sprintsRes.data.data
             : []
         );
-
         setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : []);
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err.response || err);
+        console.error(err);
         setError(err.response?.data?.message || err.message || "Unknown error");
       }
     };
@@ -55,101 +45,73 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  
-  // ---------------- Overall Activities ----------------
   const totalProjects = projects.length;
   const totalSprints = sprints.length;
   const totalTasks = tasks.length;
-  const overdueTasks = tasks.filter(
-    (t) => t?.due_date && new Date(t.due_date) < today
-  ).length;
 
-  // console.log("userId:", userId);
-  // if(userId===tasks.assignee_id) {
-  //   return console.log("matched");
-  // }
-  // ---------------- My Activities ----------------
-  const myTasks = tasks.filter((t) => t?.assignee_id === userId); 
-  // match kortesi user id er sathe task table er assignee_id er sathe
-  // console.log("My Tasks:", myTasks);
+  const myTasks = tasks.filter((t) => t?.assignee_id === userId);
   const mySprintIds = [...new Set(myTasks.map((t) => t?.sprint_id))];
-  // console.log("My Sprint IDs:", mySprintIds);
   const mySprints = sprints.filter((s) => mySprintIds.includes(s?.id));
-  // console.log("My Sprints:", mySprints);
   const myProjectIds = [...new Set(mySprints.map((s) => s?.project_id))];
-  // console.log("My Project IDs:", myProjectIds);
   const myProjects = projects.filter((p) => myProjectIds.includes(p?.id));
-  // console.log("My Projects:", myProjects);
 
   return (
-    <div className="bg-gray-50 min-h-screen py-10">
+    <div className="bg-gray-50 min-h-screen py-12 font-sans">
       <div className="container mx-auto px-4">
-        {/* Error Message */}
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && (
+          <p className="text-red-500 mb-6 text-center font-medium">{error}</p>
+        )}
 
         {/* ---------------- Overall Activities ---------------- */}
-        <h1 className="text-xl font-semibold text-gray-700 mb-4">
+        <h1 className="text-2xl font-extrabold text-gray-700 mb-6">
           Overall Activities
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
           <StatCard
             title="Total Projects"
             value={totalProjects}
-            icon={<FolderOpen className="text-blue-600" size={24} />}
-            bgColor="bg-blue-100"
-            textColor="text-gray-800"
+            icon={<FolderOpen size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-blue-500 to-blue-400"
             onClick={() => navigate("/projects")}
           />
           <StatCard
             title="Total Sprints"
             value={totalSprints}
-            icon={<Calendar className="text-purple-600" size={24} />}
-            bgColor="bg-purple-100"
-            textColor="text-purple-700"
+            icon={<Calendar size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-purple-500 to-purple-400"
             onClick={() => navigate("/sprint-office")}
           />
           <StatCard
             title="Total Tasks"
             value={totalTasks}
-            icon={<CheckSquare className="text-green-600" size={24} />}
-            bgColor="bg-green-100"
-            textColor="text-green-700"
+            icon={<CheckSquare size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-green-500 to-green-400"
             onClick={() => navigate("/task-office")}
-          />
-          <StatCard
-            title="Overdue Tasks"
-            value={overdueTasks}
-            icon={<AlertCircle className="text-red-600" size={24} />}
-            bgColor="bg-red-100"
-            textColor="text-red-600"
           />
         </div>
 
         {/* ---------------- My Activities ---------------- */}
-        <h1 className="text-xl font-semibold text-gray-700 mb-4">
+        <h1 className="text-2xl font-extrabold text-gray-700 mb-6">
           My Activities
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <StatCard
             title="My Projects"
             value={myProjects.length}
-            icon={<FolderOpen className="text-blue-600" size={24} />}
-            bgColor="bg-blue-100"
-            textColor="text-gray-800"
+            icon={<FolderOpen size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-blue-500 to-blue-400"
           />
           <StatCard
             title="My Sprints"
             value={mySprints.length}
-            icon={<Calendar className="text-purple-600" size={24} />}
-            bgColor="bg-purple-100"
-            textColor="text-purple-700"
+            icon={<Calendar size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-purple-500 to-purple-400"
           />
           <StatCard
             title="My Tasks"
             value={myTasks.length}
-            icon={<CheckSquare className="text-green-600" size={24} />}
-            bgColor="bg-green-100"
-            textColor="text-green-700"
+            icon={<CheckSquare size={28} className="text-white" />}
+            bgColor="bg-gradient-to-r from-green-500 to-green-400"
           />
         </div>
       </div>
@@ -158,17 +120,19 @@ const Dashboard = () => {
 };
 
 // ---------------- Reusable StatCard Component ----------------
-const StatCard = ({ title, value, icon, bgColor, textColor, onClick }) => (
+const StatCard = ({ title, value, icon, bgColor, onClick }) => (
   <div
     onClick={onClick}
-    className="relative bg-white rounded-xl p-5 shadow hover:shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer"
+    className="flex items-center justify-between p-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cursor-pointer bg-white"
   >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-500 font-medium">{title}</p>
-        <p className={`text-2xl md:text-3xl font-bold ${textColor}`}>{value}</p>
-      </div>
-      <div className={`p-3 rounded-full ${bgColor}`}>{icon}</div>
+    <div>
+      <p className="text-sm font-medium text-gray-500">{title}</p>
+      <p className="text-2xl font-bold text-gray-800 mt-2">{value}</p>
+    </div>
+    <div
+      className={`p-4 rounded-full flex items-center justify-center ${bgColor}`}
+    >
+      {icon}
     </div>
   </div>
 );

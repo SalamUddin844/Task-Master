@@ -1,7 +1,6 @@
 const db = require("../database/connectdb");
 
 // -------------------- GET ALL TASKS --------------------
-// -------------------- GET ALL TASKS --------------------
 exports.getTasks = (req, res) => {
   const query = `
     SELECT 
