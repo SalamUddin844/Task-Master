@@ -1,146 +1,276 @@
-# 📘 Project Management App (Task Master)
+
+
+# 📘 Task Master – Project Management App
 
 ## 🚀 Overview
 
-This is a full-stack **Project Management Application** 
+Task Master is a **full-stack project management application** that helps teams manage projects, sprints, and tasks efficiently.
 
-The app allows users to: - Register & Login securely (JWT
-authentication)\
-- Manage workspaces, projects, sprints, and tasks\
-- Assign tasks to users\
-- Search, filter, and update projects & tasks\
-- Reset password via email (Nodemailer)\
-- Use light mode toggle for better UX
+**Main Features:**
 
-------------------------------------------------------------------------
+* ✅ User Authentication (Register, Login, Forgot, Reset Password) *(must do)*
+* ✅ Projects, Sprint & Task Management *(must do)*
+* ✅ Task Assignment with status tracking *(must do)*
+* ✅ Live Chat / Comments *(optional)*
+* ✅ Email-based Password Recovery *(must do)*
+* ✅ Role Management (user and admin) *(must do)*
+* ✅ Invite member via email to register *(must do)*
+
+---
 
 ## 🛠 Tech Stack
 
 ### **Frontend**
 
--   React.js\
--   React Router v6\
--   Axios\
--   TailwindCSS\
--   shadcn/ui, lucide-react, FontAwesome
+* **React.js** → Build UI using JSX
+* **React Router v6** → Page navigation (with ProtectedRoute)
+* **Axios** → Modern API calls to backend
+* **Tailwind CSS** → Responsive and modern UI
+* **LocalStorage** → Store JWT token + user data
 
 ### **Backend**
 
--   Node.js + Express.js\
--   JWT (Authentication & Authorization)\
--   bcrypt (Password hashing)\
--   Nodemailer (Email service)
+* **Node.js + Express.js** → REST API server
+* **MySQL** → Relational database (normalized schema)
+* **JWT** → Authentication & Authorization
+* **bcrypt** → Secure password hashing
+* **Nodemailer** → Email system for password reset
 
 ### **Database**
 
--   MySQL\
--   Tables: users, workspaces, projects, sprints, tasks, assignees
+* Tables: `users`, `projects`, `sprints`, `tasks`, `messages`, `assignees`
+* Relational structure using Foreign Keys
 
-------------------------------------------------------------------------
+---
 
-## ⚙️ Architecture
+## 🖥 Frontend Components (Detailed)
 
-    React Frontend (UI + Routing/Navigation + Axios) 
-              │
-              ▼
-    Express.js Backend (API routes + Middleware + COntrollers)
-              │
-              ▼
-           MySQL Database (Relational data storage)
+### **Auth Components**
 
-------------------------------------------------------------------------
+**Register.js**
 
-## 🗄 Database Schema
+* Fields: `name`, `email`, `password`
+* Validations: Email regex, password strength (length, uppercase, special char)
+* API: `POST /api/auth/register` → JWT token stored → redirect to Dashboard
 
-### `users`
+**Login.js**
 
-  Field                 Type           Notes
-  --------------------- -------------- ----------------------------
-  id (PK, AI)           INT            
-  name                  VARCHAR(255)   
-  email                 VARCHAR(255)   Unique
-  password              VARCHAR(255)   Hashed (bcrypt)
-  role                  ENUM           Default: user
-  reset_token           VARCHAR(255)   For password reset
-  reset_token_expires   TIMESTAMP      Expiration time
-  created_at            TIMESTAMP      Default: CURRENT_TIMESTAMP
+* Fields: `email`, `password`
+* API: `POST /api/auth/login` → store token + user info in localStorage → redirect to protected route
 
-### Other Tables
+**ForgotPassword.js**
 
--   **workspaces** → id, name, created_at\
--   **projects** → id, workspace_id, name, description, created_at\
--   **sprints** → id, project_id, title, start_date, end_date\
--   **tasks** → id, sprint_id, title, description, status, priority,
-    due_date\
--   **assignees** → id, task_id, user_id
+* Field: `email`
+* API: `POST /api/auth/forgot-password` → backend sends reset email
 
-------------------------------------------------------------------------
+**ResetPassword.js**
 
-## 🌐 Backend API Routes
+* Field: `new password`
+* API: `POST /api/auth/reset-password/:token` → validate token → update password
+
+---
+
+### **Main Components**
+
+**Dashboard.js**
+
+* Active Projects count
+* Tasks summary (ToDo, InProgress, Done)
+* Quick links to projects & chat
+
+**Projects**
+
+* List of projects
+* Project info & actions (edit, view sprints, delete)
+
+**Sprints**
+
+* List all sprints for a project
+* Sprint info & actions (edit, view tasks, delete)
+
+**Tasks**
+
+* List all tasks for a sprint
+* Task details: start/end date, due date, status, assignee, priority
+* Actions: assign user, edit, delete
+
+**Live Chat (Optional)**
+
+* Sidebar: Team members list
+* Chat window: messages with timestamps
+* Input: type message + send
+* API: `POST /api/messages`
+
+**UX Enhancements:**
+
+* Auto-scroll to bottom
+* Selected user highlighted
+* Error messages shown
+
+---
+
+## 🖥 Backend (Detailed)
 
 ### **Auth**
 
--   `POST /api/auth/register` → Register user\
--   `POST /api/auth/login` → Login user\
--   `POST /api/auth/forgot-password` → Send reset email\
--   `POST /api/auth/reset-password/:token` → Reset password
+* `POST /api/auth/register` → validate input → bcrypt hash → save user → return `{ token, user }`
+* `POST /api/auth/login` → validate → return `{ token, user }`
+* `POST /api/auth/forgot-password` → generate reset token → send email
+* `POST /api/auth/reset-password/:token` → validate token → update password
 
 ### **Projects**
 
--   `GET /api/projects` → Get all projects\
--   `POST /api/projects` → Create project\
--   `PUT /api/projects/:id` → Update project\
--   `DELETE /api/projects/:id` → Delete project\
--   `GET /api/projects/:id` → Get project with sprints
+* `GET /api/projects` → all projects
+* `POST /api/projects` → create project
+* `GET /api/projects/:id` → project details
 
 ### **Sprints**
 
--   `POST /api/sprints` → Create sprint\
--   `GET /api/projects/:id/sprints` → Get sprints of a project
+* `GET /api/sprints/:projectId` → project’s sprints
+* `POST /api/sprints` → create sprint
 
 ### **Tasks**
 
--   `POST /api/tasks` → Create task\
--   `PUT /api/tasks/:id` → Update task\
--   `DELETE /api/tasks/:id` → Delete task\
--   `GET /api/sprints/:id/tasks` → Get tasks of a sprint
+* `GET /api/tasks/:sprintId` → sprint’s tasks
+* `POST /api/tasks` → create task
+* `PUT /api/tasks/:id` → update task
 
-------------------------------------------------------------------------
-## 🔑 Features
+### **Live Chat**
 
--   🔐 **Authentication** → JWT login/register, bcrypt password hashing,
-    reset via email\
--   📂 **Project Management** → Create, edit, delete projects,
-    search/filter projects, sprints & tasks\
--   🎨 **UI/UX** →modals, confirmation
-    prompts
-------------------------------------------------------------------------
+* `GET /api/messages/users` → all users except current
+* `GET /api/messages/:userId` → conversation between two users
+* `POST /api/messages` → save message
+
+---
+
+## 🗄 Database Schema (Detailed)
+
+### **Users**
+
+| Field             | Type             | Notes |
+| ----------------- | ---------------- | ----- |
+| id                | PK               |       |
+| name              | VARCHAR(100)     |       |
+| email             | UNIQUE           |       |
+| password          | hashed           |       |
+| role              | ENUM(user/admin) |       |
+| reset\_token      | VARCHAR          |       |
+| reset\_token\_exp | DATETIME         |       |
+
+**Used in:** Auth, Task Assignee, Chat
+
+### **Projects**
+
+| Field       | Type      | Notes |
+| ----------- | --------- | ----- |
+| id          | PK        |       |
+| name        | VARCHAR   |       |
+| description | TEXT      |       |
+| created\_at | TIMESTAMP |       |
+
+**Used in:** Dashboard, Project List
+
+### **Sprints**
+
+| Field       | Type    | Notes |
+| ----------- | ------- | ----- |
+| id          | PK      |       |
+| project\_id | FK      |       |
+| title       | VARCHAR |       |
+| start\_date | DATE    |       |
+| end\_date   | DATE    |       |
+
+**Used in:** Project Details → Sprint List
+
+### **Tasks**
+
+| Field        | Type      | Notes                |
+| ------------ | --------- | -------------------- |
+| id           | PK        |                      |
+| sprint\_id   | FK        |                      |
+| title        | VARCHAR   |                      |
+| description  | TEXT      |                      |
+| status       | ENUM      | ToDo/InProgress/Done |
+| assignee\_id | FK        |                      |
+| created\_at  | TIMESTAMP |                      |
+
+**Used in:** Sprint Page → Task List
+
+### **Messages**
+
+| Field        | Type      | Notes |
+| ------------ | --------- | ----- |
+| id           | PK        |       |
+| sender\_id   | FK        |       |
+| receiver\_id | FK        |       |
+| message      | TEXT      |       |
+| created\_at  | TIMESTAMP |       |
+
+**Used in:** LiveChat
+
+---
+
+## 🔄 Data Flow Example
+
+**User Registration Flow:**
+React → POST `/api/auth/register` → Express → validate → bcrypt hash → DB insert → return JWT → store in localStorage
+
+**Chat Flow:**
+User selects teammate → React calls `GET /api/messages/:userId` → Express fetches messages → return JSON → User sends → POST `/api/messages` → insert DB → refresh messages
+
+---
+
+## 🔐 Security
+
+* Password hashing: bcrypt + salt=10
+* JWT: stored in LocalStorage, sent in `Authorization: Bearer` header
+* Email validation before DB entry
+* Reset token expiry: 1 hour
+* Role-based access ready for future
+
+---
+
+## 📈 Future Improvements
+
+* Real-time WebSocket (Socket.IO) chat
+* Group chat + file sharing
+* Admin dashboard
+* Notifications system
+* Task comments
+
+---
 
 ## ▶️ Setup Instructions
 
 ### 1. Clone repo
 
-``` bash
+```bash
 git clone <repo_url>
 cd project-management-app
 ```
 
 ### 2. Backend Setup
 
-``` bash
+```bash
 cd backend
 npm install
-cp .env.example .env   # configure DB, JWT_SECRET, SMTP
+cp .env.example .env   # configure DataBase, JWT_SECRET, SMTP
 node createDatabase.js # create database & tables
 npm start
 ```
+
 ### 3. Frontend Setup
 
-``` bash
+```bash
 cd frontend
 npm install
 npm start
 ```
+
 ### 4. Open in browser
 
-    http://localhost:3000
+
+http://localhost:3000
+
+
+
