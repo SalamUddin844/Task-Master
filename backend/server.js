@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config({ path: "./database/.env" });
+const chatRoutes = require("./routes/chatRoute");
 
 const app = express();
 
@@ -20,8 +21,8 @@ app.use("/api/sprints", require("./routes/sprintRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));
 app.use("/api/users", require("./routes/userRoute"));
+app.use("/api/messages", chatRoutes);
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

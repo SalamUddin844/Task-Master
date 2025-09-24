@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import CreateModal from "./modals/modal";
+import CreateModal from "./modals/addNewModal";
 import BACKEND_API from "../config";
 
 const PolygonBoard = () => {
@@ -56,6 +56,7 @@ const PolygonBoard = () => {
     fetchData();
   }, [token, user]);
 
+  //clear localStorage and redirect to login,session ended
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

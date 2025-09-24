@@ -14,6 +14,7 @@ import SprintOffice from "./components/pages/Sprint-Manager/SprintOffice";
 import SprintTasks from "./components/pages/Task-Manager/SprintTasks"; 
 import Team from "./components/pages/Team-Manager/Team";
 import Reports from "./components/pages/Reports-Stats/Reports";
+import LiveChat from "./components/pages/chatOption/LiveChat";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="projects/:projectId" element={<ProjectDetails />} />
           <Route path="task-office" element={<TaskOffice />} />
           <Route path="sprint-office" element={<SprintOffice />} />
+          <Route path="/live-chat" element={<LiveChat />} />
 
           <Route path="projects/:projectId/sprints/:sprintId" element={<SprintTasks />} />
           

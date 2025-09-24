@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   X,
+  MessageSquare, // ✅ Add chat icon
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -24,6 +25,7 @@ const Sidebar = ({ user, onLogout }) => {
     { id: "projects", label: "Projects", icon: FolderOpen, route: "/projects" },
     { id: "sprint-office", label: "Sprint Office", icon: Calendar, route: "/sprint-office" },
     { id: "task-office", label: "Task Office", icon: CheckSquare, route: "/task-office" },
+    { id: "live-chat", label: "Live Chat", icon: MessageSquare, route: "/live-chat" }, // ✅ Added Live Chat
   ];
 
   const adminMenu = [

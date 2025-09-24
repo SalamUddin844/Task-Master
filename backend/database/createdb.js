@@ -12,7 +12,9 @@ async function initDB() {
     });
 
     // Create database if not exists
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\``);
+    await connection.query(
+      `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\``
+    );
     console.log(`Database "${process.env.DB_NAME}" created or already exists`);
 
     // Switch to the new database
@@ -30,18 +32,21 @@ async function initDB() {
         reset_token_expires DATETIME,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+
       `CREATE TABLE IF NOT EXISTS projects (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+
       `CREATE TABLE IF NOT EXISTS team_members (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         role VARCHAR(100)
       )`,
+
       `CREATE TABLE IF NOT EXISTS sprints (
         id INT AUTO_INCREMENT PRIMARY KEY,
         project_id INT NOT NULL,
@@ -53,6 +58,17 @@ async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
       )`,
+
+      `CREATE TABLE IF NOT EXISTS messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        sender_id INT NOT NULL,
+        receiver_id INT NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+      )`,
+
       `CREATE TABLE IF NOT EXISTS tasks (
         id INT AUTO_INCREMENT PRIMARY KEY,
         sprint_id INT NOT NULL,
@@ -74,10 +90,10 @@ async function initDB() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci`
     ];
 
-    for (let i = 0; i < createTables.length; i++) {
-      await connection.query(createTables[i]);
-      console.log(`Table ${i + 1} created/verified`);
-    }
+    // for (let i = 0; i < createTables.length; i++) {
+    //   await connection.query(createTables[i]);
+    //   console.log(`Table ${i + 1} created/verified`);
+    // }
 
     console.log("All tables created successfully.");
     await connection.end();
