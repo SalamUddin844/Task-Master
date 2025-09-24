@@ -8,13 +8,13 @@ Task Master is a **full-stack project management application** that helps teams 
 
 **Main Features:**
 
-* ✅ User Authentication (Register, Login, Forgot, Reset Password) *(must do)*
-* ✅ Projects, Sprint & Task Management *(must do)*
-* ✅ Task Assignment with status tracking *(must do)*
-* ✅ Live Chat / Comments *(optional)*
-* ✅ Email-based Password Recovery *(must do)*
-* ✅ Role Management (user and admin) *(must do)*
-* ✅ Invite member via email to register *(must do)*
+* ✅ User Authentication (Register, Login, Forgot, Reset Password) *(Json Web Token)*
+* ✅ Projects, Sprint & Task Management
+* ✅ Task Assignment with status tracking 
+* ✅ Live Chat / Comments
+* ✅ Email-based Password Recovery
+* ✅ Role Management (user and admin)
+* ✅ Invite member via email to register 
 
 ---
 
