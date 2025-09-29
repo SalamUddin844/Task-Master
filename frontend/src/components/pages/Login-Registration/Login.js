@@ -1,53 +1,51 @@
 import { useState } from 'react';
-import {toast} from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BACKEND_API from "../../../config";
 
-
-export default function Login() {     
-
-  //logical part
+export default function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' }); /// data entered by user IN LOGIN FORM
-  const [showPassword, setShowPassword] = useState(false); 
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value })); /// updates formData state with user input
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' })); // clear field error while typing
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();   /// prevents the default form submission behavior
-    setError(''); // clear previous errors
-    setLoading(true);  // to disable the submit button and show loading state
-
-    
-    
-  /// Send login request to backend
+    e.preventDefault();
+    setErrors({ email: '', password: '' });
+    setLoading(true);
 
     try {
-      const res = await axios.post(`${BACKEND_API}/auth/login`, formData);// post request to backend with formData (email and password)
+      const res = await axios.post(`${BACKEND_API}/auth/login`, formData);
       toast.success("Login Successful!");
-      const { token, user } = res.data; /// extract token and user info from response
+      const { token, user } = res.data;
 
-      // Save token and user info
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));// user info is stored as a string
+      localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('role', user.role);
 
-      navigate('/dashboard');  /// redirect to dashboard on successful login
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed'); /// error status that set to backend like database error, invalid credentials
+      const message = err.response?.data?.message || 'Login failed';
+      if (message.toLowerCase().includes("email")) {
+        setErrors((prev) => ({ ...prev, email: "Email not found" }));
+      } else if (message.toLowerCase().includes("password")) {
+        setErrors((prev) => ({ ...prev, password: "Wrong password" }));
+      } else {
+        toast.error(message); // fallback generic error
+      }
     } finally {
-      setLoading(false);  /// not coming here if login is successfull
+      setLoading(false);
     }
   };
 
-
-  //UI rendering part
   return (
     <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -63,41 +61,35 @@ export default function Login() {
         </div>
 
         <form
-          onSubmit={handleSubmit} // when form is submitted, handleSubmit function is called
+          onSubmit={handleSubmit}
           className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6"
         >
-          {error && (
-            <div className="bg-red-100 text-red-700 p-2 rounded text-center text-sm">
-              {error}
-            </div>
-          )}
-
           {/* Email */}
           <div className="relative">
-            <label htmlFor="email" className='block text-gray-700 text-sm mb-2'>Email</label>
-            {/* <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" /> */}
+            <label htmlFor="email" className="block text-gray-700 text-sm mb-2">
+              Email
+            </label>
             <input
               id="email"
               type="email"
               name="email"
-              value={formData.email}  // value is taken from formData state
-              onChange={handleChange}// when user types, handleChange function is called to update formData state
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Email address"
-              className="w-full pl-5 pr-4 py-3 text-sm border border-gray-200 rounded-xl 
-                         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                         outline-none transition-all"
+              className={`w-full pl-5 pr-4 py-3 text-sm border rounded-xl outline-none transition-all
+                         ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-200 focus:ring-blue-500"}`}
               required
             />
+            {errors.email && (
+              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
           <div className="relative">
-            <label
-              for="password" className="block text-gray-700 text-sm mb-2"
-            >
+            <label htmlFor="password" className="block text-gray-700 text-sm mb-2">
               Password
             </label>
-            {/* <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" /> */}
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
@@ -105,19 +97,20 @@ export default function Login() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full pl-5 pr-10 py-3 text-sm border border-gray-200 rounded-xl 
-                         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                         outline-none transition-all"
+              className={`w-full pl-5 pr-10 py-3 text-sm border rounded-xl outline-none transition-all
+                         ${errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-200 focus:ring-blue-500"}`}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-12 right-0 pr-3 flex items-center 
-                         text-gray-400 hover:text-gray-600"
+              className="absolute inset-y-12 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
+            {errors.password && (
+              <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+            )}
           </div>
 
           {/* Forgot Password */}
@@ -144,7 +137,7 @@ export default function Login() {
             {loading ? 'Signing In...' : 'Sign In'}
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
-          
+
           {/* Sign Up Link */}
           <p className="text-center text-gray-500 text-sm mt-4">
             Don’t have an account?{' '}
